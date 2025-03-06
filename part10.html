@@ -15,15 +15,19 @@
 <script type="text/javascript">
 
 var config = {
+    antialias: false,
     type: Phaser.AUTO,
-    width: 800,
-    height: 600,
+    // width: 800,
+    // height: 600,
     physics: {
         default: 'arcade',
         arcade: {
             gravity: { y: 300 },
             debug: false
         }
+    },
+    scale: {
+        mode: Phaser.ScaleModes.RESIZE,
     },
     scene: {
         preload: preload,
@@ -47,7 +51,7 @@ function preload ()
 {
     this.load.image('sky', 'assets/sky.png');
     this.load.image('ground', 'assets/platform.png');
-    this.load.image('star', 'assets/star.png');
+    this.load.image('star', 'assets/bomb.png');
     this.load.image('bomb', 'assets/bomb.png');
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
 }
@@ -111,10 +115,19 @@ function create ()
 
         //  Give each star a slightly different bounce
         child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-
+        child.setVelocityX(Phaser.Math.FloatBetween(-10,10));
     });
 
-    bombs = this.physics.add.group();
+    bombs = this.physics.add.staticGroup();
+
+    let sep = 50;
+    for(let row = 1; row < 10; row++){
+        let x = 400 - (row-1)*sep/2;
+        let y = row * sep;
+        for (let i = 0; i < row; i++){
+            bombs.create(x + i * sep, y, 'bomb').setScale(2);
+        }
+    }
 
     //  The score
     scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
@@ -123,11 +136,12 @@ function create ()
     this.physics.add.collider(player, platforms);
     this.physics.add.collider(stars, platforms);
     this.physics.add.collider(bombs, platforms);
+    this.physics.add.collider(stars, bombs);
 
     //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
     this.physics.add.overlap(player, stars, collectStar, null, this);
 
-    this.physics.add.collider(player, bombs, hitBomb, null, this);
+    // this.physics.add.collider(player, bombs, hitBomb, null, this);
 }
 
 function update ()
