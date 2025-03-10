@@ -8,17 +8,23 @@
         body {
             margin: 0;
         }
+        game-container {
+            width: 100%;
+            height: 100vh;
+        }
     </style>
 </head>
 <body>
 
+<div id="game-container"></div>
 <script type="text/javascript">
 
 var config = {
     antialias: false,
     type: Phaser.AUTO,
-    // width: 800,
-    // height: 600,
+    parent: 'game-container',
+    // width: 1600,
+    // height: 1000,
     physics: {
         default: 'arcade',
         arcade: {
@@ -27,7 +33,7 @@ var config = {
         }
     },
     scale: {
-        mode: Phaser.ScaleModes.RESIZE,
+        mode: Phaser.ScaleModes.ENVELOP,
     },
     scene: {
         preload: preload,
