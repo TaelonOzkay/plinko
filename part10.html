@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Plinko</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<script type="text/javascript">
+
+var config = {
+    type: Phaser.AUTO,
+    width: window.innerWidth,
+    height: window.innerHeight,
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 400 },
+            friction: { x: 0, y: 0 },
+            debug: true
+        }
+    },
+    scene: {
+        preload: preload,
+        create: create,
+        update: update
+    }
+};
+
+var game = new Phaser.Game(config);
+
+window.addEventListener('resize', () => {
+    game.scale.resize(window.innerWidth, window.innerHeight);
+});
+
+var stars;
+var bombs;
+var cursors;
+var button;
+
+function preload() {
+    this.load.image('sky', 'assets/sky.png');
+    this.load.image('star', 'assets/star.png');
+    this.load.image('bomb', 'assets/bomb.png');
+    this.load.image('button', 'assets/button.png');
+}
+
+function create() {
+    // Background
+    this.add.image(400, 300, 'sky');
+
+    // Create the button (button.png) and make it interactive
+    button = this.add.image(200, 200, 'button').setInteractive();
+
+    // When the button is clicked, make the stars visible
+    button.on('pointerdown', makeStarsVisible, this);
+    
+    // Input Events
+    cursors = this.input.keyboard.createCursorKeys();
+
+    // Center bombs
+    const gameWidth = this.sys.game.config.width;
+    let sep = 50;
+    bombs = this.physics.add.staticGroup();
+    
+    for (let row = 3; row < 12; row++) {
+        let rowWidth = (row - 1) * sep;
+        let startX = (gameWidth - rowWidth) / 2;
+        let y = row * sep;
+        for (let i = 0; i < row; i++) {
+            let bomb = bombs.create(startX + i * sep, y, 'bomb');
+            bomb.setScale(0.1).refreshBody();
+            bomb.body.setCircle(12);
+        }
+    }
+
+    stars = this.physics.add.group({
+        key: 'star',
+        repeat: 10,
+        setXY: { x: (gameWidth / 2), y: 0, stepX: 10 },
+        bounceY: 0.4,
+        collideWorldBounds: false
+    });
+
+    stars.children.iterate(star => {
+        star.setScale(0.08);  // Apply scaling here
+        // star.body.setSize(star.width, star.height);  // Update the physics body size to match the scaled size
+        star.body.setCircle(100,20,20);
+        star.body.setFriction(0,0);
+        star.setVisible(true);  // Make stars invisible initially
+    });
+
+    // Add collision between stars and bombs
+    this.physics.add.collider(stars, bombs);
+}
+
+// Function to make stars visible when the button is clicked
+function makeStarsVisible() {
+    stars.children.iterate(star => {
+        star.setVisible(true);  // Make each star visible
+    });
+}
+
+function update() {}
+
+</script>
+
+</body>
+</html>
