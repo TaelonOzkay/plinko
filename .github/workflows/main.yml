@@ -1,4 +1,4 @@
-wname: Build NodeJS Project and Deploy to GitHub Pages
+name: Build NodeJS Project and Deploy to GitHub Pages
 
 on:
   push:
